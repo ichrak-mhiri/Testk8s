@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: frontend-angular
+spec:
+ replicas: 2
+ strategy:
+  type: RollingUpdate
+ selector:
+  matchLabels:
+   app: frontend-angular
+ template:
+   metadata:
+    labels:
+     app: frontend-angular
+     env: prod
+   spec:
+    containers:
+    - name: frontend-angular
+      image: ichrakmhiri1506/frontendproject:latest
+      ports:
+      - containerPort: 4200
+      command: ["ng","serve","--host","0.0.0.0","--port","4200"]
+      env:
+      - name: URL
+        value: "http://10.108.84.203:32221"

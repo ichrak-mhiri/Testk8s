@@ -1,14 +1,12 @@
-FROM node:14.20-alpine
-# Install necessary packages
-RUN apk update && \
-    apk upgrade && \
-    apk add --no-cache bash git
-
-# Install Angular CLI globally
-RUN npm install -g @angular/cli
+### STAGE 1: Build ###
+FROM node:12.7-alpine AS build
 WORKDIR /usr/src/app
-COPY package.json package-lock.json ./
+COPY package.json ./
 RUN npm install
 COPY . .
-RUN ng build --prod
-ENTRYPOINT ["ng","serve","--host","0.0.0.0","--port","4200"]
+RUN npm run build
+### STAGE 2: Run ###
+FROM nginx:1.17.1-alpine
+COPY default.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /usr/src/app/dist/kanban-ui /usr/share/nginx/html
+EXPOSE 80
